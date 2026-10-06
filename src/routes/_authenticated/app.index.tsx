@@ -4,7 +4,7 @@ import { useMyProfile } from "@/hooks/use-my-profile";
 import { ShieldCheck, Hash, Search, UserPlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/app")({
+export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({ meta: [{ title: "Verified Chat" }] }),
   component: AppHome,
 });
