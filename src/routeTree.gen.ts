@@ -9,28 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
-import { Route as AuthenticatedAppFriendsRouteImport } from './routes/_authenticated/app.friends'
 import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
-import { Route as AuthenticatedAppDmIdRouteImport } from './routes/_authenticated/app.dm.$id'
-import { Route as AuthenticatedAppRoomSlugRouteImport } from './routes/_authenticated/app.room.$slug'
+import { Route as AuthenticatedAppFriendsRouteImport } from './routes/_authenticated/app.friends'
 import { Route as AuthenticatedAppUShortIdRouteImport } from './routes/_authenticated/app.u.$shortId'
+import { Route as AuthenticatedAppRoomSlugRouteImport } from './routes/_authenticated/app.room.$slug'
+import { Route as AuthenticatedAppDmIdRouteImport } from './routes/_authenticated/app.dm.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
@@ -38,33 +38,33 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppFriendsRoute = AuthenticatedAppFriendsRouteImport.update({
-  id: '/app/friends',
-  path: '/app/friends',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
   id: '/app/search',
   path: '/app/search',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppDmIdRoute = AuthenticatedAppDmIdRouteImport.update({
-  id: '/app/dm/$id',
-  path: '/app/dm/$id',
+const AuthenticatedAppFriendsRoute = AuthenticatedAppFriendsRouteImport.update({
+  id: '/app/friends',
+  path: '/app/friends',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppRoomSlugRoute =
-  AuthenticatedAppRoomSlugRouteImport.update({
-    id: '/app/room/$slug',
-    path: '/app/room/$slug',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAppUShortIdRoute =
   AuthenticatedAppUShortIdRouteImport.update({
     id: '/app/u/$shortId',
     path: '/app/u/$shortId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAppRoomSlugRoute =
+  AuthenticatedAppRoomSlugRouteImport.update({
+    id: '/app/room/$slug',
+    path: '/app/room/$slug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppDmIdRoute = AuthenticatedAppDmIdRouteImport.update({
+  id: '/app/dm/$id',
+  path: '/app/dm/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,11 +140,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -154,11 +154,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/': {
@@ -168,13 +168,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/friends': {
-      id: '/_authenticated/app/friends'
-      path: '/app/friends'
-      fullPath: '/app/friends'
-      preLoaderRoute: typeof AuthenticatedAppFriendsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/app/search': {
       id: '/_authenticated/app/search'
       path: '/app/search'
@@ -182,11 +175,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/dm/$id': {
-      id: '/_authenticated/app/dm/$id'
-      path: '/app/dm/$id'
-      fullPath: '/app/dm/$id'
-      preLoaderRoute: typeof AuthenticatedAppDmIdRouteImport
+    '/_authenticated/app/friends': {
+      id: '/_authenticated/app/friends'
+      path: '/app/friends'
+      fullPath: '/app/friends'
+      preLoaderRoute: typeof AuthenticatedAppFriendsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/u/$shortId': {
+      id: '/_authenticated/app/u/$shortId'
+      path: '/app/u/$shortId'
+      fullPath: '/app/u/$shortId'
+      preLoaderRoute: typeof AuthenticatedAppUShortIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app/room/$slug': {
@@ -196,11 +196,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRoomSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/u/$shortId': {
-      id: '/_authenticated/app/u/$shortId'
-      path: '/app/u/$shortId'
-      fullPath: '/app/u/$shortId'
-      preLoaderRoute: typeof AuthenticatedAppUShortIdRouteImport
+    '/_authenticated/app/dm/$id': {
+      id: '/_authenticated/app/dm/$id'
+      path: '/app/dm/$id'
+      fullPath: '/app/dm/$id'
+      preLoaderRoute: typeof AuthenticatedAppDmIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
