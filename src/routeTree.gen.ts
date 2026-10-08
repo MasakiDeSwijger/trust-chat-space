@@ -9,30 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
-import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
-import { Route as AuthenticatedAppFriendsRouteImport } from './routes/_authenticated/app.friends'
 import { Route as AuthenticatedAppAssistantRouteImport } from './routes/_authenticated/app.assistant'
-import { Route as AuthenticatedAppUShortIdRouteImport } from './routes/_authenticated/app.u.$shortId'
-import { Route as AuthenticatedAppRoomSlugRouteImport } from './routes/_authenticated/app.room.$slug'
+import { Route as AuthenticatedAppFriendsRouteImport } from './routes/_authenticated/app.friends'
+import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
 import { Route as AuthenticatedAppDmIdRouteImport } from './routes/_authenticated/app.dm.$id'
+import { Route as AuthenticatedAppRoomSlugRouteImport } from './routes/_authenticated/app.room.$slug'
+import { Route as AuthenticatedAppUShortIdRouteImport } from './routes/_authenticated/app.u.$shortId'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAssistantRoute = ApiAssistantRouteImport.update({
@@ -45,20 +45,31 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
-  id: '/app/search',
-  path: '/app/search',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedAppAssistantRoute =
+  AuthenticatedAppAssistantRouteImport.update({
+    id: '/app/assistant',
+    path: '/app/assistant',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppFriendsRoute = AuthenticatedAppFriendsRouteImport.update({
   id: '/app/friends',
   path: '/app/friends',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppAssistantRoute =
-  AuthenticatedAppAssistantRouteImport.update({
-    id: '/app/assistant',
-    path: '/app/assistant',
+const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
+  id: '/app/search',
+  path: '/app/search',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppDmIdRoute = AuthenticatedAppDmIdRouteImport.update({
+  id: '/app/dm/$id',
+  path: '/app/dm/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppRoomSlugRoute =
+  AuthenticatedAppRoomSlugRouteImport.update({
+    id: '/app/room/$slug',
+    path: '/app/room/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAppUShortIdRoute =
@@ -67,17 +78,6 @@ const AuthenticatedAppUShortIdRoute =
     path: '/app/u/$shortId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAppRoomSlugRoute =
-  AuthenticatedAppRoomSlugRouteImport.update({
-    id: '/app/room/$slug',
-    path: '/app/room/$slug',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAppDmIdRoute = AuthenticatedAppDmIdRouteImport.update({
-  id: '/app/dm/$id',
-  path: '/app/dm/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -166,11 +166,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -180,11 +180,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/assistant': {
@@ -201,11 +201,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/search': {
-      id: '/_authenticated/app/search'
-      path: '/app/search'
-      fullPath: '/app/search'
-      preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
+    '/_authenticated/app/assistant': {
+      id: '/_authenticated/app/assistant'
+      path: '/app/assistant'
+      fullPath: '/app/assistant'
+      preLoaderRoute: typeof AuthenticatedAppAssistantRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app/friends': {
@@ -215,18 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFriendsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/assistant': {
-      id: '/_authenticated/app/assistant'
-      path: '/app/assistant'
-      fullPath: '/app/assistant'
-      preLoaderRoute: typeof AuthenticatedAppAssistantRouteImport
+    '/_authenticated/app/search': {
+      id: '/_authenticated/app/search'
+      path: '/app/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/u/$shortId': {
-      id: '/_authenticated/app/u/$shortId'
-      path: '/app/u/$shortId'
-      fullPath: '/app/u/$shortId'
-      preLoaderRoute: typeof AuthenticatedAppUShortIdRouteImport
+    '/_authenticated/app/dm/$id': {
+      id: '/_authenticated/app/dm/$id'
+      path: '/app/dm/$id'
+      fullPath: '/app/dm/$id'
+      preLoaderRoute: typeof AuthenticatedAppDmIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app/room/$slug': {
@@ -236,11 +236,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRoomSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/dm/$id': {
-      id: '/_authenticated/app/dm/$id'
-      path: '/app/dm/$id'
-      fullPath: '/app/dm/$id'
-      preLoaderRoute: typeof AuthenticatedAppDmIdRouteImport
+    '/_authenticated/app/u/$shortId': {
+      id: '/_authenticated/app/u/$shortId'
+      path: '/app/u/$shortId'
+      fullPath: '/app/u/$shortId'
+      preLoaderRoute: typeof AuthenticatedAppUShortIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
