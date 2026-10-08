@@ -8,6 +8,13 @@
       "when": 1791279739170,
       "tag": "0000_ai_assistant_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791447490274,
+      "tag": "0001_groups_and_profile_extras",
+      "breakpoints": true
     }
   ]
 }

@@ -154,6 +154,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          custom_status: string | null
           display_name: string
           email_verified: boolean
           id: string
@@ -168,6 +169,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          custom_status?: string | null
           display_name: string
           email_verified?: boolean
           id: string
@@ -182,6 +184,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          custom_status?: string | null
           display_name?: string
           email_verified?: boolean
           id?: string
@@ -349,6 +352,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_group_member: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: undefined
+      }
       can_see_dm: {
         Args: { _dm_id: string; _user_id: string }
         Returns: boolean
@@ -357,6 +364,7 @@ export type Database = {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
+      create_group: { Args: { _name: string }; Returns: string }
       generate_short_id: { Args: never; Returns: string }
       has_role: {
         Args: {
