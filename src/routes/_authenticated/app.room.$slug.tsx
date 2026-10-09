@@ -1,6 +1,7 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { AppShell } from "@/components/chat/AppShell";
 import { ChatView } from "@/components/chat/ChatView";
+import { AddMemberButton } from "@/components/chat/AddMemberButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
@@ -36,7 +37,7 @@ function RoomPage() {
     <AppShell>
       {isLoading && <div className="grid h-full place-items-center text-muted-foreground">Loading room…</div>}
       {!isLoading && !room && <div className="grid h-full place-items-center text-muted-foreground">Room not found.</div>}
-      {room && <ChatView kind="room" id={room.id} title={`#${room.name}`} subtitle={room.description ?? undefined} />}
+      {room && <ChatView kind="room" id={room.id} title={`#${room.name}`} subtitle={room.description ?? (room.is_group ? "Private group" : undefined)} actions={room.is_group ? <AddMemberButton roomId={room.id} /> : undefined} />}
     </AppShell>
   );
 }

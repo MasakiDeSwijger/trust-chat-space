@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import { formatDistanceToNow } from "date-fns";
+import { EmojiStickerPicker, StickerView, VoiceRecorder } from "./ComposerExtras";
 
 type Reaction = { message_id: string; user_id: string; emoji: string };
 
@@ -22,11 +23,13 @@ export function ChatView({
   id,
   title,
   subtitle,
+  actions,
 }: {
   kind: "room" | "dm";
   id: string;
   title: string;
   subtitle?: string;
+  actions?: React.ReactNode;
 }) {
   const { data: me } = useMyProfile();
   const qc = useQueryClient();
@@ -99,6 +102,7 @@ export function ChatView({
           <h1 className="font-display text-lg font-bold truncate">{title}</h1>
           {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
         </div>
+        {actions}
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin md:px-6">
@@ -189,7 +193,11 @@ function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
             <span className="text-[10px] text-muted-foreground">· {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</span>
           </div>
         )}
-        {message.content && <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{message.content}</p>}
+        {message.attachment_type === "sticker" ? (
+          <StickerView id={message.content ?? ""} />
+        ) : message.content ? (
+          <p className={cn("whitespace-pre-wrap break-words leading-relaxed", /^\p{Extended_Pictographic}{1,3}$/u.test(message.content.replace(/\s|\uFE0F/g, "")) ? "text-4xl" : "text-sm")}>{message.content}</p>
+        ) : null}
         {message.attachment_url && <Attachment url={message.attachment_url} type={message.attachment_type ?? ""} name={message.attachment_name ?? "file"} />}
         {Object.keys(grouping).length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">
@@ -235,7 +243,15 @@ function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
 }
 
 function Attachment({ url, type, name }: { url: string; type: string; name: string }) {
-  const isImage = type.startsWith("image/");
+  const isImage = type.startsWith("image/") || type === "gif";
+  if (type.startsWith("audio/")) {
+    return (
+      <div className="mt-1 inline-flex items-center gap-2 rounded-2xl border border-border bg-card/60 px-3 py-2">
+        <span className="text-lg">🎤</span>
+        <audio controls src={url} className="h-9 max-w-[260px]" preload="metadata" />
+      </div>
+    );
+  }
   if (isImage) {
     return (
       <a href={url} target="_blank" rel="noreferrer" className="mt-1 block max-w-xs overflow-hidden rounded-lg border border-border">
@@ -280,6 +296,24 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
     try { await send(value); } finally { setSending(false); }
   }
 
+  async function uploadAndSend(file: Blob, name: string, type: string, caption = "") {
+    if (!me) return;
+    const path = `${me.id}/${Date.now()}-${name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const { error: upErr } = await supabase.storage.from("chat-uploads").upload(path, file, { contentType: type });
+    if (upErr) throw upErr;
+    const { data: signed } = await supabase.storage.from("chat-uploads").createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (!signed?.signedUrl) throw new Error("Upload failed");
+    await send(caption, { url: signed.signedUrl, type, name });
+  }
+
+  async function onVoice(blob: Blob, seconds: number) {
+    if (seconds < 1) return;
+    setSending(true);
+    try { await uploadAndSend(blob, `voice-${seconds}s.webm`, blob.type || "audio/webm"); }
+    catch (err: any) { toast.error(err.message); }
+    finally { setSending(false); }
+  }
+
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !me) return;
@@ -304,10 +338,15 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
   return (
     <form onSubmit={onSubmit} className="border-t border-border bg-card/40 px-3 py-3 backdrop-blur md:px-6">
       <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-border bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-primary/40">
-        <input ref={fileRef} type="file" hidden onChange={onFile} accept="image/*,.pdf,.txt,.zip,.doc,.docx" />
+        <input ref={fileRef} type="file" hidden onChange={onFile} accept="image/*,audio/*,video/*,.pdf,.txt,.zip,.doc,.docx" />
         <Button type="button" variant="ghost" size="sm" className="h-8 w-8 shrink-0 p-0" onClick={() => fileRef.current?.click()} disabled={sending}>
           <Paperclip className="h-4 w-4" />
         </Button>
+        <EmojiStickerPicker
+          onEmoji={(e) => setText((t) => t + e)}
+          onSticker={(sid) => { if (!me) return; const payload: any = { sender_id: me.id, content: sid, attachment_type: "sticker" }; if (kind === "room") payload.room_id = id; else payload.dm_id = id; supabase.from("messages").insert(payload).then(({ error }) => error && toast.error(error.message)); }}
+          onGif={(url) => send("", { url, type: "gif", name: "GIF" })}
+        />
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -316,6 +355,7 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
           placeholder="Type a message…"
           className="min-h-0 flex-1 resize-none border-0 bg-transparent p-1 text-sm focus-visible:ring-0"
         />
+        {!text.trim() && <VoiceRecorder onRecorded={onVoice} disabled={sending} />}
         <Button type="submit" disabled={sending || !text.trim()} className="h-8 shrink-0 bg-brand text-primary-foreground hover:opacity-95">
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
