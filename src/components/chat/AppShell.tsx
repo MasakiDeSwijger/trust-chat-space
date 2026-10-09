@@ -6,7 +6,9 @@ import { usePresence } from "@/hooks/use-presence";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listPublicRooms, listMyGroups, listOnlineUsers, listDmConversations } from "@/lib/chat-api";
 import { Avatar, StatusDot } from "@/components/chat/UserBadge";
-import { ShieldCheck, Hash, Users, Search, UserPlus, LogOut, Plus, MessageCircle, Shield } from "lucide-react";
+import { ShieldCheck, Hash, Users, Search, UserPlus, LogOut, Plus, MessageCircle, Shield, Bot } from "lucide-react";
+import { SettingsDialog } from "./SettingsDialog";
+import { useNotifications } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -19,6 +21,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const { data: me } = useMyProfile();
   const navigate = useNavigate();
   usePresence(me?.id);
+  useNotifications(me?.id);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -30,7 +33,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-dvh w-full overflow-hidden">
       {/* Left sidebar */}
       <aside className="hidden w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
         <SidebarContent me={me} onSignOut={handleSignOut} />
@@ -40,7 +43,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       <main className="flex min-w-0 flex-1 flex-col bg-background">
         <MobileHeader me={me} onSignOut={handleSignOut} />
         <div className="flex min-h-0 flex-1">
-          <div className="min-w-0 flex-1">{children ?? <Outlet />}</div>
+          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto scrollbar-thin">{children ?? <Outlet />}</div>
           {/* Online users sidebar */}
           <aside className="hidden w-64 shrink-0 border-l border-sidebar-border bg-sidebar text-sidebar-foreground lg:block">
             <OnlineSidebar />
@@ -118,6 +121,11 @@ function SidebarContent({ me, onSignOut }: { me: any; onSignOut: () => void }) {
         <NewGroupButton />
       </div>
 
+      <Link to="/app/assistant" className={cn("mx-3 mt-3 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 hover:bg-primary/20", router === "/app/assistant" && "ring-1 ring-primary")}>
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand"><Bot className="h-4 w-4 text-primary-foreground" /></span>
+        <div className="min-w-0"><div className="text-sm font-semibold">Verity AI</div><div className="text-[11px] text-muted-foreground">Ask me anything</div></div>
+      </Link>
+
       <div className="mt-4 flex-1 overflow-y-auto px-2 scrollbar-thin">
         <SidebarSection label="Public Rooms" icon={Hash}>
           {rooms.map((r) => (
@@ -159,6 +167,7 @@ function SidebarContent({ me, onSignOut }: { me: any; onSignOut: () => void }) {
       </div>
 
       <div className="border-t border-sidebar-border p-2">
+        <SettingsDialog me={me} />
         <button onClick={onSignOut} className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground">
           <LogOut className="h-4 w-4" /> Sign out
         </button>
@@ -215,19 +224,9 @@ function NewGroupButton() {
     if (!me) return;
     setBusy(true);
     try {
-      const slug = `g-${Math.random().toString(36).slice(2, 8)}`;
-      const { data, error } = await supabase
-        .from("rooms")
-        .insert({ name: name.trim() || "New group", slug, is_public: false, is_group: true, created_by: me.id })
-        .select()
-        .single();
+      const { data: slug, error } = await supabase.rpc("create_group", { _name: name.trim() });
       if (error) throw error;
-      // Bypass RLS by inserting via the user's own membership using service is not possible.
-      // Members policy only allows joining public rooms by self. So we insert via a server function-like path:
-      // Workaround: temporarily flip to public, join, flip back.
-      await supabase.from("rooms").update({ is_public: true }).eq("id", data.id);
-      await supabase.from("room_members").insert({ room_id: data.id, user_id: me.id, role: "owner" });
-      await supabase.from("rooms").update({ is_public: false }).eq("id", data.id);
+      const data = { slug: slug as string };
       toast.success("Group created");
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["my-groups", me.id] });
