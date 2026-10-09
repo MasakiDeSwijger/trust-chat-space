@@ -17,6 +17,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppAssistantRouteImport } from './routes/_authenticated/app.assistant'
 import { Route as AuthenticatedAppFriendsRouteImport } from './routes/_authenticated/app.friends'
 import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
+import { Route as AuthenticatedAppCallKeyRouteImport } from './routes/_authenticated/app.call.$key'
 import { Route as AuthenticatedAppDmIdRouteImport } from './routes/_authenticated/app.dm.$id'
 import { Route as AuthenticatedAppRoomSlugRouteImport } from './routes/_authenticated/app.room.$slug'
 import { Route as AuthenticatedAppUShortIdRouteImport } from './routes/_authenticated/app.u.$shortId'
@@ -61,6 +62,11 @@ const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
   path: '/app/search',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppCallKeyRoute = AuthenticatedAppCallKeyRouteImport.update({
+  id: '/app/call/$key',
+  path: '/app/call/$key',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppDmIdRoute = AuthenticatedAppDmIdRouteImport.update({
   id: '/app/dm/$id',
   path: '/app/dm/$id',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/app/friends': typeof AuthenticatedAppFriendsRoute
   '/app/search': typeof AuthenticatedAppSearchRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/call/$key': typeof AuthenticatedAppCallKeyRoute
   '/app/dm/$id': typeof AuthenticatedAppDmIdRoute
   '/app/room/$slug': typeof AuthenticatedAppRoomSlugRoute
   '/app/u/$shortId': typeof AuthenticatedAppUShortIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/app/friends': typeof AuthenticatedAppFriendsRoute
   '/app/search': typeof AuthenticatedAppSearchRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/call/$key': typeof AuthenticatedAppCallKeyRoute
   '/app/dm/$id': typeof AuthenticatedAppDmIdRoute
   '/app/room/$slug': typeof AuthenticatedAppRoomSlugRoute
   '/app/u/$shortId': typeof AuthenticatedAppUShortIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/app/friends': typeof AuthenticatedAppFriendsRoute
   '/_authenticated/app/search': typeof AuthenticatedAppSearchRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/call/$key': typeof AuthenticatedAppCallKeyRoute
   '/_authenticated/app/dm/$id': typeof AuthenticatedAppDmIdRoute
   '/_authenticated/app/room/$slug': typeof AuthenticatedAppRoomSlugRoute
   '/_authenticated/app/u/$shortId': typeof AuthenticatedAppUShortIdRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/app/friends'
     | '/app/search'
     | '/app/'
+    | '/app/call/$key'
     | '/app/dm/$id'
     | '/app/room/$slug'
     | '/app/u/$shortId'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/app/friends'
     | '/app/search'
     | '/app'
+    | '/app/call/$key'
     | '/app/dm/$id'
     | '/app/room/$slug'
     | '/app/u/$shortId'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/friends'
     | '/_authenticated/app/search'
     | '/_authenticated/app/'
+    | '/_authenticated/app/call/$key'
     | '/_authenticated/app/dm/$id'
     | '/_authenticated/app/room/$slug'
     | '/_authenticated/app/u/$shortId'
@@ -222,6 +234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/call/$key': {
+      id: '/_authenticated/app/call/$key'
+      path: '/app/call/$key'
+      fullPath: '/app/call/$key'
+      preLoaderRoute: typeof AuthenticatedAppCallKeyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/dm/$id': {
       id: '/_authenticated/app/dm/$id'
       path: '/app/dm/$id'
@@ -251,6 +270,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppFriendsRoute: typeof AuthenticatedAppFriendsRoute
   AuthenticatedAppSearchRoute: typeof AuthenticatedAppSearchRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppCallKeyRoute: typeof AuthenticatedAppCallKeyRoute
   AuthenticatedAppDmIdRoute: typeof AuthenticatedAppDmIdRoute
   AuthenticatedAppRoomSlugRoute: typeof AuthenticatedAppRoomSlugRoute
   AuthenticatedAppUShortIdRoute: typeof AuthenticatedAppUShortIdRoute
@@ -261,6 +281,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppFriendsRoute: AuthenticatedAppFriendsRoute,
   AuthenticatedAppSearchRoute: AuthenticatedAppSearchRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppCallKeyRoute: AuthenticatedAppCallKeyRoute,
   AuthenticatedAppDmIdRoute: AuthenticatedAppDmIdRoute,
   AuthenticatedAppRoomSlugRoute: AuthenticatedAppRoomSlugRoute,
   AuthenticatedAppUShortIdRoute: AuthenticatedAppUShortIdRoute,
