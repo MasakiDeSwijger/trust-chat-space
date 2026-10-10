@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Phone, Video as VideoIcon } from "lucide-react";
 import { EmojiStickerPicker, StickerView, VoiceRecorder } from "./ComposerExtras";
 
 type Reaction = { message_id: string; user_id: string; emoji: string };
@@ -102,7 +104,10 @@ export function ChatView({
           <h1 className="font-display text-lg font-bold truncate">{title}</h1>
           {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
         </div>
-        {actions}
+        <div className="flex items-center gap-1.5">
+          <CallButtons kind={kind} id={id} />
+          {actions}
+        </div>
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin md:px-6">
@@ -193,7 +198,9 @@ function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
             <span className="text-[10px] text-muted-foreground">· {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</span>
           </div>
         )}
-        {message.attachment_type === "sticker" ? (
+        {message.attachment_type === "call" ? (
+          <CallCard callKey={message.content ?? ""} video={message.attachment_name === "video"} />
+        ) : message.attachment_type === "sticker" ? (
           <StickerView id={message.content ?? ""} />
         ) : message.content ? (
           <p className={cn("whitespace-pre-wrap break-words leading-relaxed", /^\p{Extended_Pictographic}{1,3}$/u.test(message.content.replace(/\s|\uFE0F/g, "")) ? "text-4xl" : "text-sm")}>{message.content}</p>
@@ -361,5 +368,44 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
         </Button>
       </div>
     </form>
+  );
+}
+
+
+function CallButtons({ kind, id }: { kind: "room" | "dm"; id: string }) {
+  const { data: me } = useMyProfile();
+  const navigate = useNavigate();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  async function start(video: boolean) {
+    if (!me) return;
+    const key = `${kind}-${id}`;
+    const payload: any = { sender_id: me.id, content: key, attachment_type: "call", attachment_name: video ? "video" : "voice" };
+    if (kind === "room") payload.room_id = id; else payload.dm_id = id;
+    const { error } = await supabase.from("messages").insert(payload);
+    if (error) return toast.error(error.message);
+    navigate({ to: "/app/call/$key", params: { key }, search: { video, back: path } });
+  }
+  return (
+    <>
+      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => start(false)} aria-label="Start voice call" title="Voice call"><Phone className="h-4 w-4" /></Button>
+      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => start(true)} aria-label="Start video call" title="Video call / meeting"><VideoIcon className="h-4 w-4" /></Button>
+    </>
+  );
+}
+
+function CallCard({ callKey, video }: { callKey: string; video: boolean }) {
+  const navigate = useNavigate();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <div className="mt-1 inline-flex items-center gap-3 rounded-2xl border border-primary/40 bg-primary/10 px-4 py-3">
+      <span className="grid h-10 w-10 place-items-center rounded-full bg-brand text-primary-foreground">
+        {video ? <VideoIcon className="h-5 w-5" /> : <Phone className="h-5 w-5" />}
+      </span>
+      <div>
+        <div className="text-sm font-semibold">{video ? "Video call started" : "Voice call started"}</div>
+        <div className="text-xs text-muted-foreground">Tap join to hop in</div>
+      </div>
+      <Button size="sm" className="bg-brand text-primary-foreground" onClick={() => navigate({ to: "/app/call/$key", params: { key: callKey }, search: { video, back: path } })}>Join</Button>
+    </div>
   );
 }

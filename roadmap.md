@@ -10,6 +10,6 @@
 - [x] Voice messages
 - [x] Themes (switchable)
 - [x] Notifications (new message toasts + browser notifications)
-- [ ] Voice/video calls & group meetings
+- [x] Voice/video calls & group meetings
 - [ ] Games
 - [ ] Pass (earn chat icons, themes, text bubble styles)
