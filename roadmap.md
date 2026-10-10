@@ -11,5 +11,6 @@
 - [x] Themes (switchable)
 - [x] Notifications (new message toasts + browser notifications)
 - [x] Voice/video calls & group meetings
+- [x] Login prompt for optional camera, microphone, and notification permissions
 - [ ] Games
 - [ ] Pass (earn chat icons, themes, text bubble styles)

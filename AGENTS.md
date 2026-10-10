@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep login permission onboarding in the shared authenticated AppShell, scoped per user and browser session; only user gestures request device permissions, and setup streams must stop immediately to avoid recording.
