@@ -34,7 +34,7 @@ export function useNotifications(myId: string | undefined) {
         if (!target || window.location.pathname === target && document.visibilityState === "visible") return;
         const { data: sender } = await supabase.from("profiles").select("display_name").eq("id", m.sender_id).maybeSingle();
         const who = sender?.display_name ?? "Someone";
-        const body = m.content ? String(m.content).slice(0, 120) : m.attachment_type?.startsWith("audio/") ? "🎤 Voice message" : "📎 Attachment";
+        const body = m.attachment_type === "call" ? "📞 Started a call — tap Open to join" : m.attachment_type === "sticker" ? "Sent a sticker" : m.content ? String(m.content).slice(0, 120) : m.attachment_type?.startsWith("audio/") ? "🎤 Voice message" : "📎 Attachment";
         const go = () => navigate({ to: target! });
         toast(`${who} ${place}`, { description: body, action: { label: "Open", onClick: go } });
         if (typeof Notification !== "undefined" && Notification.permission === "granted" && document.visibilityState !== "visible") {
