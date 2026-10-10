@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PermissionPrompt } from "./PermissionPrompt";
 
 export function AppShell({ children }: { children?: React.ReactNode }) {
   const { data: me } = useMyProfile();
@@ -24,6 +25,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   useNotifications(me?.id);
 
   async function handleSignOut() {
+    if (me) {
+      try { sessionStorage.removeItem(`chat-permissions:${me.id}`); } catch { /* Storage may be disabled. */ }
+    }
     await supabase.auth.signOut();
     navigate({ to: "/auth" });
   }
@@ -34,6 +38,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh w-full overflow-hidden">
+      <PermissionPrompt userId={me.id} />
       {/* Left sidebar */}
       <aside className="hidden w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
         <SidebarContent me={me} onSignOut={handleSignOut} />
