@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Message, Profile } from "@/lib/chat-api";
 import { Avatar } from "./UserBadge";
-import { ShieldCheck, Smile, Trash2, Flag, Paperclip, Send, Loader2, Image as ImageIcon, FileIcon } from "lucide-react";
+import { Reply, X, ShieldCheck, Smile, Trash2, Flag, Paperclip, Send, Loader2, Image as ImageIcon, FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -36,6 +36,7 @@ export function ChatView({
   const { data: me } = useMyProfile();
   const qc = useQueryClient();
   const filterKey = kind === "room" ? "room_id" : "dm_id";
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
 
   const messagesQuery = useQuery({
     queryKey: ["messages", kind, id],
@@ -92,6 +93,7 @@ export function ChatView({
 
   const messages = messagesQuery.data ?? [];
   const senders = sendersQuery.data ?? {};
+  const byId: Record<string, Message> = Object.fromEntries(messages.map((m) => [m.id, m]));
   const reactionsByMsg: Record<string, Reaction[]> = {};
   for (const r of reactionsQuery.data ?? []) {
     (reactionsByMsg[r.message_id] ??= []).push(r);
@@ -130,19 +132,30 @@ export function ChatView({
                 reactions={reactionsByMsg[m.id] ?? []}
                 grouped={!!grouped}
                 myId={me?.id}
+                replied={m.reply_to ? byId[m.reply_to] : undefined}
+                repliedName={m.reply_to && byId[m.reply_to] ? senders[byId[m.reply_to].sender_id]?.display_name : undefined}
+                onReply={() => setReplyTo(m)}
               />
             );
           })}
         </div>
       </div>
 
-      <Composer kind={kind} id={id} />
+      <Composer kind={kind} id={id} replyTo={replyTo} replyName={replyTo ? senders[replyTo.sender_id]?.display_name : undefined} clearReply={() => setReplyTo(null)} />
     </div>
   );
 }
 
-function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
+function preview(m: Message) {
+  if (m.attachment_type === "sticker") return "Sticker";
+  if (m.attachment_type === "call") return "Call";
+  if (m.content) return m.content.slice(0, 120);
+  return m.attachment_type?.startsWith("audio/") ? "Voice message" : m.attachment_name ?? "Attachment";
+}
+
+function MessageItem({ message, sender, isMe, reactions, grouped, myId, replied, repliedName, onReply }: {
   message: Message; sender?: Profile; isMe: boolean; reactions: Reaction[]; grouped: boolean; myId?: string;
+  replied?: Message; repliedName?: string; onReply: () => void;
 }) {
   const qc = useQueryClient();
   const grouping = reactions.reduce<Record<string, { count: number; mine: boolean }>>((acc, r) => {
@@ -198,6 +211,12 @@ function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
             <span className="text-[10px] text-muted-foreground">· {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</span>
           </div>
         )}
+        {message.reply_to && (
+          <div className="mt-1 mb-0.5 flex items-center gap-1.5 border-l-2 border-primary/60 pl-2 text-xs text-muted-foreground">
+            <Reply className="h-3 w-3 shrink-0" />
+            {replied ? <><span className="font-semibold text-foreground/80">{repliedName ?? "Someone"}</span><span className="truncate">{preview(replied)}</span></> : <span className="italic">Original message not available</span>}
+          </div>
+        )}
         {message.attachment_type === "call" ? (
           <CallCard callKey={message.content ?? ""} video={message.attachment_name === "video"} />
         ) : message.attachment_type === "sticker" ? (
@@ -224,6 +243,7 @@ function MessageItem({ message, sender, isMe, reactions, grouped, myId }: {
         )}
       </div>
       <div className="flex shrink-0 items-start opacity-0 group-hover:opacity-100">
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onReply} aria-label="Reply" title="Reply"><Reply className="h-4 w-4" /></Button>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Smile className="h-4 w-4" /></Button>
@@ -274,7 +294,7 @@ function Attachment({ url, type, name }: { url: string; type: string; name: stri
   );
 }
 
-function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
+function Composer({ kind, id, replyTo, replyName, clearReply }: { kind: "room" | "dm"; id: string; replyTo: Message | null; replyName?: string; clearReply: () => void }) {
   const { data: me } = useMyProfile();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -288,10 +308,11 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
       attachment_url: attachment?.url ?? null,
       attachment_type: attachment?.type ?? null,
       attachment_name: attachment?.name ?? null,
+      reply_to: replyTo?.id ?? null,
     };
     if (kind === "room") payload.room_id = id; else payload.dm_id = id;
     const { error } = await supabase.from("messages").insert(payload);
-    if (error) toast.error(error.message);
+    if (error) toast.error(error.message); else clearReply();
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -344,6 +365,15 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
 
   return (
     <form onSubmit={onSubmit} className="border-t border-border bg-card/40 px-3 py-3 backdrop-blur md:px-6">
+      {replyTo && (
+        <div className="mx-auto mb-2 flex max-w-3xl items-center gap-2 rounded-lg border-l-2 border-primary bg-card/60 px-3 py-1.5 text-xs">
+          <Reply className="h-3.5 w-3.5 text-primary" />
+          <span className="text-muted-foreground">Replying to</span>
+          <span className="font-semibold">{replyName ?? "message"}</span>
+          <span className="truncate text-muted-foreground">{preview(replyTo)}</span>
+          <button type="button" onClick={clearReply} aria-label="Cancel reply" className="ml-auto rounded p-0.5 hover:bg-accent"><X className="h-3.5 w-3.5" /></button>
+        </div>
+      )}
       <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-border bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-primary/40">
         <input ref={fileRef} type="file" hidden onChange={onFile} accept="image/*,audio/*,video/*,.pdf,.txt,.zip,.doc,.docx" />
         <Button type="button" variant="ghost" size="sm" className="h-8 w-8 shrink-0 p-0" onClick={() => fileRef.current?.click()} disabled={sending}>
@@ -351,7 +381,7 @@ function Composer({ kind, id }: { kind: "room" | "dm"; id: string }) {
         </Button>
         <EmojiStickerPicker
           onEmoji={(e) => setText((t) => t + e)}
-          onSticker={(sid) => { if (!me) return; const payload: any = { sender_id: me.id, content: sid, attachment_type: "sticker" }; if (kind === "room") payload.room_id = id; else payload.dm_id = id; supabase.from("messages").insert(payload).then(({ error }) => error && toast.error(error.message)); }}
+          onSticker={(sid) => { if (!me) return; const payload: any = { sender_id: me.id, content: sid, attachment_type: "sticker", reply_to: replyTo?.id ?? null }; clearReply(); if (kind === "room") payload.room_id = id; else payload.dm_id = id; supabase.from("messages").insert(payload).then(({ error }) => error && toast.error(error.message)); }}
           onGif={(url) => send("", { url, type: "gif", name: "GIF" })}
         />
         <Textarea

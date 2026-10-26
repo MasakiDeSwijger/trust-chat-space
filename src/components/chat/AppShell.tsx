@@ -70,7 +70,7 @@ function MobileHeader({ me, onSignOut }: { me: any; onSignOut: () => void }) {
           <SidebarContent me={me} onSignOut={onSignOut} />
         </SheetContent>
       </Sheet>
-      <div className="font-display text-sm font-bold">Verified Chat</div>
+      <div className="font-display text-sm font-bold">Trusty</div>
       <Sheet>
         <SheetTrigger asChild><Button variant="ghost" size="sm">Online</Button></SheetTrigger>
         <SheetContent side="right" className="w-72 bg-sidebar p-0 text-sidebar-foreground"><OnlineSidebar /></SheetContent>
@@ -103,7 +103,7 @@ function SidebarContent({ me, onSignOut }: { me: any; onSignOut: () => void }) {
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand shadow-glow">
           <ShieldCheck className="h-4 w-4 text-primary-foreground" strokeWidth={2.5} />
         </span>
-        <span className="font-display text-base font-bold">Verified Chat</span>
+        <span className="font-display text-base font-bold">Trusty</span>
       </div>
 
       <Link to="/app/u/$shortId" params={{ shortId: me.short_id.replace("#", "") }} className="mx-3 flex items-center gap-3 rounded-lg border border-sidebar-border bg-sidebar-accent/40 px-3 py-2 hover:bg-sidebar-accent">

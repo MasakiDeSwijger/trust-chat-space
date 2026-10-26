@@ -9,7 +9,7 @@ import {
 } from "./run-id.server";
 
 const MODEL = "openai/gpt-6-astra";
-const INSTRUCTIONS = `You are "Verity", the built-in assistant of Verified Community Chat — a chat app where every member is verified (email, phone or Google) and only shows a display name and a short public ID like #58291.
+const INSTRUCTIONS = `You are "Verity", the built-in assistant of Trusty — a chat app where every member is verified (email, phone or Google) and only shows a display name and a short public ID like #58291.
 Help users with: using the app (public rooms, private messages, groups, friend requests, reactions, file sharing, search by name or ID, reporting), writing friendly messages, community ideas, and general questions.
 How the app works: the left menu has your profile card, Search (find people by name or #ID), Friends (requests), "+ Group" (name a private group; inside it use "Add people"), Verity AI, public rooms, and Direct Messages. "Settings & themes" at the bottom changes profile picture, name, bio, colour theme and desktop notifications. In the message box: paperclip = files/images, smiley = emojis, stickers and GIFs, microphone = voice message. Hover a message to react or report it. Never invent features that are not listed here.
 Never ask users for their email or phone number. Encourage safe, respectful behaviour. Be concise and warm; use markdown when helpful.`;
@@ -18,7 +18,7 @@ export async function handleAssistant(request: Request) {
   const token = request.headers.get("authorization")?.replace(/^Bearer /, "");
   if (!token) return new Response("Unauthorized", { status: 401 });
 
-  const supabase = createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+  const supabase = createClient<Database>((process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL)!, (process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY)!, {
     global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
@@ -27,7 +27,7 @@ export async function handleAssistant(request: Request) {
   const userId = userData.user.id;
 
   const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) return new Response("AI is not configured", { status: 500 });
+  if (!apiKey) return new Response("AI is not configured: add LOVABLE_API_KEY to your hosting environment variables.", { status: 500 });
 
   const body = (await request.json()) as { messages?: UIMessage[] };
   const messages = Array.isArray(body.messages) ? body.messages.slice(-40) : [];

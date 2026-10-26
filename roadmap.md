@@ -12,5 +12,6 @@
 - [x] Notifications (new message toasts + browser notifications)
 - [x] Voice/video calls & group meetings
 - [x] Login prompt for optional camera, microphone, and notification permissions
+- [x] Rename to Trusty, message replies, call fixes, AI on Vercel env
 - [ ] Games
 - [ ] Pass (earn chat icons, themes, text bubble styles)

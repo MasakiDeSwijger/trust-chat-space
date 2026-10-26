@@ -4,7 +4,7 @@ import { ShieldCheck, MessageCircle, Users, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Verified Chat — Real people. Real conversations. No bots." },
+      { title: "Trusty — Real people. Real conversations. No bots." },
       { name: "description", content: "Join a chat community where every account is verified by email or phone. Public rooms, private messages, groups, file sharing, real-time." },
     ],
   }),
@@ -19,7 +19,7 @@ function Landing() {
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand shadow-glow">
             <ShieldCheck className="h-4 w-4 text-primary-foreground" strokeWidth={2.5} />
           </span>
-          Verified Chat
+          Trusty
         </Link>
         <nav className="flex items-center gap-2">
           <Link to="/auth" className="rounded-md px-4 py-2 text-sm font-medium hover:bg-accent">Sign in</Link>
