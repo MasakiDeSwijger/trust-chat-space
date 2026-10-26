@@ -18,7 +18,7 @@ export async function handleAssistant(request: Request) {
   const token = request.headers.get("authorization")?.replace(/^Bearer /, "");
   if (!token) return new Response("Unauthorized", { status: 401 });
 
-  const supabase = createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+  const supabase = createClient<Database>((process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL)!, (process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY)!, {
     global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
@@ -27,7 +27,7 @@ export async function handleAssistant(request: Request) {
   const userId = userData.user.id;
 
   const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) return new Response("AI is not configured", { status: 500 });
+  if (!apiKey) return new Response("AI is not configured: add LOVABLE_API_KEY to your hosting environment variables.", { status: 500 });
 
   const body = (await request.json()) as { messages?: UIMessage[] };
   const messages = Array.isArray(body.messages) ? body.messages.slice(-40) : [];
