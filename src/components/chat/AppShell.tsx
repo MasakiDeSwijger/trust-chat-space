@@ -128,7 +128,7 @@ function SidebarContent({ me, onSignOut }: { me: any; onSignOut: () => void }) {
 
       <Link to="/app/assistant" className={cn("mx-3 mt-3 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 hover:bg-primary/20", router === "/app/assistant" && "ring-1 ring-primary")}>
         <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand"><Bot className="h-4 w-4 text-primary-foreground" /></span>
-        <div className="min-w-0"><div className="text-sm font-semibold">Verity AI</div><div className="text-[11px] text-muted-foreground">Ask me anything</div></div>
+        <div className="min-w-0"><div className="text-sm font-semibold">Trusty AI</div><div className="text-[11px] text-muted-foreground">Ask me anything</div></div>
       </Link>
 
       <div className="mt-4 flex-1 overflow-y-auto px-2 scrollbar-thin">

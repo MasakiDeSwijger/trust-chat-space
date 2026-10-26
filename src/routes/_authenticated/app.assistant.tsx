@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/app/assistant")({
   head: () => ({
     meta: [
-      { title: "Verity AI assistant — Trusty" },
-      { name: "description", content: "Ask Verity, your built-in AI helper, anything about the community." },
+      { title: "Trusty AI assistant — Trusty" },
+      { name: "description", content: "Ask Trusty AI, your built-in AI helper, anything about the community." },
     ],
   }),
   component: AssistantPage,
@@ -74,7 +74,7 @@ function AssistantChat({ initial }: { initial: UIMessage[] }) {
             <Bot className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <div className="font-display font-semibold">Verity</div>
+            <div className="font-display font-semibold">Trusty AI</div>
             <div className="text-xs text-muted-foreground">Your AI community assistant</div>
           </div>
         </div>
@@ -90,7 +90,7 @@ function AssistantChat({ initial }: { initial: UIMessage[] }) {
           {messages.length === 0 ? (
             <ConversationEmptyState
               icon={<Bot className="h-10 w-10 text-primary" />}
-              title="Hi, I'm Verity"
+              title="Hi, I'm Trusty AI"
               description="Ask how anything works, get help writing a message, or brainstorm ideas for your community."
             />
           ) : (
@@ -107,7 +107,7 @@ function AssistantChat({ initial }: { initial: UIMessage[] }) {
           {status === "submitted" && (
             <Message from="assistant">
               <MessageContent>
-                <Shimmer>Verity is thinking…</Shimmer>
+                <Shimmer>Trusty AI is thinking…</Shimmer>
               </MessageContent>
             </Message>
           )}
@@ -122,7 +122,7 @@ function AssistantChat({ initial }: { initial: UIMessage[] }) {
             sendMessage({ text });
           }}
         >
-          <PromptInputTextarea autoFocus placeholder="Message Verity…" />
+          <PromptInputTextarea autoFocus placeholder="Message Trusty AI…" />
           <PromptInputFooter>
             <PromptInputTools />
             <PromptInputSubmit status={status} onClick={busy ? (e) => { e.preventDefault(); stop(); } : undefined} />
