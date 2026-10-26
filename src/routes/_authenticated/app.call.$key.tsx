@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/call/$key")({
   validateSearch: z.object({ video: z.boolean().optional(), back: z.string().optional() }),
-  head: () => ({ meta: [{ title: "Call — Verified Chat" }, { name: "description", content: "Voice and video call with verified members." }] }),
+  head: () => ({ meta: [{ title: "Call — Trusty" }, { name: "description", content: "Voice and video call with verified members." }] }),
   component: CallPage,
 });
 

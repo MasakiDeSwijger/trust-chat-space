@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/app/assistant")({
   head: () => ({
     meta: [
-      { title: "Verity AI assistant — Verified Chat" },
+      { title: "Verity AI assistant — Trusty" },
       { name: "description", content: "Ask Verity, your built-in AI helper, anything about the community." },
     ],
   }),

@@ -5,7 +5,7 @@ import { ShieldCheck, Hash, Search, UserPlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/app/")({
-  head: () => ({ meta: [{ title: "Verified Chat" }] }),
+  head: () => ({ meta: [{ title: "Trusty" }] }),
   component: AppHome,
 });
 

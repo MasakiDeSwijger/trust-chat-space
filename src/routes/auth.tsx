@@ -17,7 +17,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Sign in — Verified Chat" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Trusty" }] }),
   component: AuthPage,
 });
 
@@ -91,7 +91,7 @@ function AuthPage() {
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand shadow-glow">
             <ShieldCheck className="h-4 w-4 text-primary-foreground" strokeWidth={2.5} />
           </span>
-          Verified Chat
+          Trusty
         </div>
         <h1 className="mt-6 font-display text-2xl font-bold">
           {mode === "signin" ? "Welcome back" : "Get verified"}

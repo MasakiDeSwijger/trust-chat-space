@@ -58,9 +58,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Verified Chat — Real people. Real conversations." },
+      { title: "Trusty — Real people. Real conversations." },
       { name: "description", content: "A community chat where every account is verified. No bots, no spam, just real conversations." },
-      { property: "og:title", content: "Verified Chat" },
+      { property: "og:title", content: "Trusty" },
       { property: "og:description", content: "Real people. Real conversations. Verified accounts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
