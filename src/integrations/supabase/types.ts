@@ -103,6 +103,7 @@ export type Database = {
           dm_id: string | null
           edited_at: string | null
           id: string
+          reply_to: string | null
           room_id: string | null
           sender_id: string
         }
@@ -116,6 +117,7 @@ export type Database = {
           dm_id?: string | null
           edited_at?: string | null
           id?: string
+          reply_to?: string | null
           room_id?: string | null
           sender_id: string
         }
@@ -129,6 +131,7 @@ export type Database = {
           dm_id?: string | null
           edited_at?: string | null
           id?: string
+          reply_to?: string | null
           room_id?: string | null
           sender_id?: string
         }
@@ -138,6 +141,13 @@ export type Database = {
             columns: ["dm_id"]
             isOneToOne: false
             referencedRelation: "dm_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
           {
